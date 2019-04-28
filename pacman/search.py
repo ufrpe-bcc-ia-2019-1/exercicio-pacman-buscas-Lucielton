@@ -86,6 +86,24 @@ def depthFirstSearch(problem):
     print "Start's successors:", problem.getSuccessors(problem.getStartState())
     """
     "*** YOUR CODE HERE ***"
+    inicio = problem.getStartState()
+    aux = problem.getStartState()
+    visitado = []
+    visitado.append(inicio)
+    estados = util.Stack()
+    estadosLista = (inicio, [])
+    estados.push(estadosLista)
+    while not estados.isEmpty() and not problem.isGoalState(aux):
+        estado, acoes = estados.pop()
+        visitado.append(estado)
+        proximo = problem.getSuccessors(estado)
+        for i in proximo:
+            coordenadas = i[0]
+            if not coordenadas in visitado:
+                aux = i[0]
+                direcao = i[1]
+                estados.push((coordenadas, acoes + [direcao]))
+    return acoes + [direcao]
     util.raiseNotDefined()
 
 
@@ -95,6 +113,24 @@ def breadthFirstSearch(problem):
     DICA: Utilizar util.PriorityQueue
     *** YOUR CODE HERE ***
     """
+    inicio = problem.getStartState()
+    visitado = []
+    visitado.append(inicio)
+    estados = util.Queue()
+    estadoLista = (inicio, [])
+    estados.push(estadoLista)
+    while not estados.isEmpty():
+        estado, acao = estados.pop()
+        if problem.isGoalState(estado):
+            return acao
+        proximo = problem.getSuccessors(estado)
+        for i in proximo:
+            coordenadas = i[0]
+            if not coordenadas in visitado:
+                direcao = i[1]
+                visitado.append(coordenadas)
+                estados.push((coordenadas, acao + [direcao]))
+    return acao
     util.raiseNotDefined()
 
     
@@ -102,6 +138,24 @@ def uniformCostSearch(problem):
     """Search the node of least total cost first.
     *** YOUR CODE HERE ***
     """
+    inicio = problem.getStartState()
+    visitado = []
+    estados = util.PriorityQueue()
+    estados.push((inicio, []) ,0)
+    while not estados.isEmpty():
+        estado, acoes = estados.pop()
+        if problem.isGoalState(estado):
+            return acoes
+        if estado not in visitado:
+            proximos = problem.getSuccessors(estado)
+            for prox in proximos:
+                coordenadas = prox[0]
+                if coordenadas not in visitado:
+                    direcoes = prox[1]
+                    custo = acoes + [direcoes]
+                    estados.push((coordenadas, acoes + [direcoes]), problem.getCostOfActions(custo))
+        visitado.append(estado)
+    return acoes
     util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
@@ -114,6 +168,26 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
+    inicio = problem.getStartState()
+    visitado = []
+    estados = util.PriorityQueue()
+    estados.push((inicio, []), nullHeuristic(inicio, problem))
+    custo = 0
+    while not estados.isEmpty():
+        estado, acoes = estados.pop()
+        if problem.isGoalState(estado):
+            return acoes
+        if estado not in visitado:
+            proximos = problem.getSuccessors(estado)
+            for prox in proximos:
+                coordenadas = prox[0]
+                if coordenadas not in visitado:
+                    direcoes = prox[1]
+                    nAcoes = acoes + [direcoes]
+                    custo = problem.getCostOfActions(nAcoes) + heuristic(coordenadas, problem)
+                    estados.push((coordenadas, acoes + [direcoes]), custo)
+        visitado.append(estado)
+    return acoes
     util.raiseNotDefined()
 
 
